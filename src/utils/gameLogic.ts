@@ -1,5 +1,10 @@
-// Game logic utilities
-export function calculateWinner(squares: (string | null)[]) {
+// Core game logic utilities
+interface WinResult {
+  winner: string;
+  line: number[];
+}
+
+export function calculateWinner(squares: (string | null)[]): WinResult | null {
   const lines = [
     [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
     [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
@@ -12,11 +17,4 @@ export function calculateWinner(squares: (string | null)[]) {
     }
   }
   return null;
-}
-
-export function getAvailableSquares(board: (string | null)[]) {
-  return board.reduce<number[]>((acc, square, index) => {
-    if (!square) acc.push(index);
-    return acc;
-  }, []);
 }

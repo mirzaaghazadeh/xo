@@ -1,20 +1,33 @@
 import React from 'react';
-import { Gamepad2, User, Hash, Plus, Minus } from 'lucide-react';
+import { Gamepad2, User, Hash, Plus, Minus, Sword } from 'lucide-react';
 
 interface UserSetupModalProps {
-  onSubmit: (playerName: string, rounds: number) => void;
+  onSubmit: (playerName: string, rounds: number, difficulty: 'easy' | 'normal' | 'very-hard') => void;
   initialName: string;
   initialRounds: number;
+  initialDifficulty?: 'easy' | 'normal' | 'very-hard';
 }
 
-export function UserSetupModal({ onSubmit, initialName, initialRounds }: UserSetupModalProps) {
+export function UserSetupModal({ 
+  onSubmit, 
+  initialName, 
+  initialRounds,
+  initialDifficulty = 'normal' 
+}: UserSetupModalProps) {
   const [playerName, setPlayerName] = React.useState(initialName);
   const [rounds, setRounds] = React.useState(initialRounds);
+  const [difficulty, setDifficulty] = React.useState(initialDifficulty);
+
+  const difficultyConfig = {
+    easy: { color: 'from-green-500 to-green-600', icon: '🌱', label: 'Beginner friendly' },
+    normal: { color: 'from-blue-500 to-blue-600', icon: '⚔️', label: 'Balanced challenge' },
+    'very-hard': { color: 'from-red-500 to-red-600', icon: '🔥', label: 'Unbeatable AI' },
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (playerName.trim()) {
-      onSubmit(playerName, rounds);
+      onSubmit(playerName, rounds, difficulty);
     }
   };
 
@@ -47,6 +60,34 @@ export function UserSetupModal({ onSubmit, initialName, initialRounds }: UserSet
               placeholder="Enter your name"
               required
             />
+          </div>
+          <div className="space-y-3">
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+              <Sword className="w-4 h-4" />
+              Select Difficulty
+            </label>
+            <div className="space-y-2">
+              {(Object.entries(difficultyConfig) as [keyof typeof difficultyConfig, typeof difficultyConfig[keyof typeof difficultyConfig]][]).map(([mode, config]) => (
+                <button
+                  key={mode}
+                  type="button"
+                  onClick={() => setDifficulty(mode)}
+                  className={`w-full px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
+                    difficulty === mode
+                      ? `bg-gradient-to-r ${config.color} text-white transform scale-[1.02] shadow-lg`
+                      : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="flex items-center gap-2">
+                      <span className="text-xl">{config.icon}</span>
+                      <span className="capitalize">{mode.replace('-', ' ')}</span>
+                    </span>
+                    <span className="text-sm opacity-75">{config.label}</span>
+                  </div>
+                </button>
+              ))}
+            </div>
           </div>
           <div className="space-y-2">
             <label htmlFor="rounds" className="flex items-center gap-2 text-sm font-medium text-gray-700">

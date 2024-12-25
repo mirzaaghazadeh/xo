@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { calculateWinner, getAvailableSquares } from '../utils/gameLogic';
+import { calculateWinner } from '../utils/gameLogic';
+import { getBestMove } from '../utils/aiStrategies';
 
 export function useGameState() {
   const [playerName, setPlayerName] = useState<string | null>(null);
@@ -11,28 +12,18 @@ export function useGameState() {
   const [computerScore, setComputerScore] = useState(0);
   const [winningLine, setWinningLine] = useState<number[] | null>(null);
   const [showSetup, setShowSetup] = useState(false);
+  const [difficulty, setDifficulty] = useState<'easy' | 'normal' | 'very-hard'>('normal');
 
-  const resetGame = (name: string, rounds: number) => {
+  const resetGame = (name: string, rounds: number, newDifficulty: 'easy' | 'normal' | 'very-hard') => {
     setPlayerName(name);
     setTotalRounds(rounds);
+    setDifficulty(newDifficulty);
     setCurrentRound(1);
     setSquares(Array(9).fill(null));
     setXIsNext(true);
     setPlayerScore(0);
     setComputerScore(0);
     setWinningLine(null);
-  };
-
-  const makeComputerMove = (board: (string | null)[]) => {
-    const availableSquares = getAvailableSquares(board);
-    if (availableSquares.length > 0) {
-      const randomIndex = Math.floor(Math.random() * availableSquares.length);
-      const newSquares = [...board];
-      newSquares[availableSquares[randomIndex]] = 'O';
-      setSquares(newSquares);
-      setXIsNext(true);
-      checkWinner(newSquares);
-    }
   };
 
   const checkWinner = (currentSquares: (string | null)[]) => {
@@ -57,6 +48,15 @@ export function useGameState() {
         setXIsNext(true);
       }, 1000);
     }
+  };
+
+  const makeComputerMove = (board: (string | null)[]) => {
+    const moveIndex = getBestMove(board, difficulty);
+    const newSquares = [...board];
+    newSquares[moveIndex] = 'O';
+    setSquares(newSquares);
+    setXIsNext(true);
+    checkWinner(newSquares);
   };
 
   const handleSquareClick = (i: number) => {
@@ -99,5 +99,6 @@ export function useGameState() {
     getStatus,
     showSetup,
     setShowSetup,
+    difficulty,
   };
 }

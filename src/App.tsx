@@ -18,17 +18,19 @@ export default function App() {
     handleSquareClick,
     getStatus,
     showSetup,
-    setShowSetup
+    setShowSetup,
+    difficulty
   } = useGameState();
 
   if (!playerName || showSetup) {
     return <UserSetupModal 
-      onSubmit={(name, rounds) => {
+      onSubmit={(name, rounds, diff) => {
         setShowSetup(false);
-        resetGame(name, rounds);
+        resetGame(name, rounds, diff);
       }}
       initialName={localStorage.getItem('lastPlayerName') || ''} 
-      initialRounds={Number(localStorage.getItem('lastRounds')) || 5} 
+      initialRounds={Number(localStorage.getItem('lastRounds')) || 5}
+      initialDifficulty={(localStorage.getItem('lastDifficulty') as 'easy' | 'normal' | 'hard') || 'normal'}
     />;
   }
 
@@ -43,6 +45,7 @@ export default function App() {
         onPlayAgain={() => {
           localStorage.setItem('lastPlayerName', playerName);
           localStorage.setItem('lastRounds', totalRounds.toString());
+          localStorage.setItem('lastDifficulty', difficulty);
           setShowSetup(true);
         }}
       />
